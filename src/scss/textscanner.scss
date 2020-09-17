@@ -1,0 +1,39 @@
+div.App {
+  width: 100vw;
+  height: 100vh;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  header {
+    h1 {
+      font-weight: 500;
+      font-size: 24px;
+      color: #ff79c6;
+      span {
+        color: #50fa7b;
+        font-weight: 600;
+      }
+    }
+  }
+
+  div.text-container {
+    width: 50%;
+    @media (max-width: 768px) {
+      width: 90%;
+    }
+
+    p {
+      text-align: justify;
+      text-align-last: left;
+      margin: 10px 0;
+      line-height: 1.4;
+      font-size: 14px;
+      color: #f8f8f2;
+    }
+  }
+}
