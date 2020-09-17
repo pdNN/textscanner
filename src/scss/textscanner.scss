@@ -36,4 +36,17 @@ div.App {
       color: #f8f8f2;
     }
   }
+
+  footer {
+    h2 {
+      font-weight: 500;
+      font-size: 18px;
+      color: #ff79c6;
+      text-align: center;
+      span {
+        color: #50fa7b;
+        font-weight: 600;
+      }
+    }
+  }
 }

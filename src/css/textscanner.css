@@ -46,4 +46,16 @@ div.App div.text-container p {
   font-size: 14px;
   color: #f8f8f2;
 }
+
+div.App footer h2 {
+  font-weight: 500;
+  font-size: 18px;
+  color: #ff79c6;
+  text-align: center;
+}
+
+div.App footer h2 span {
+  color: #50fa7b;
+  font-weight: 600;
+}
 /*# sourceMappingURL=textscanner.css.map */
