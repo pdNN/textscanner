@@ -9,6 +9,7 @@ function App() {
   const [wordSelected, setWordSelected] = useState('-');
   const [textLine, setTextLine] = useState(null);
   const [paragraphNumber, setParagraphNumber] = useState(null);
+  const [allTextLine, setAllTextLine] = useState(null);
 
   // split paragraph in words inside span
   const splitParagraphs = useCallback(() => {
@@ -33,15 +34,79 @@ function App() {
   };
 
   // get clicked span paragraph line
-  function getLine(el) {
-    const position = parseInt(el.offsetTop);
-    const paragraphPosition = parseInt(el.parentElement.offsetTop);
+  function getWordLine(el) {
+    let position = parseInt(el.offsetTop);
+    let paragraphPosition = parseInt(el.parentElement.offsetTop);
     const style = window.getComputedStyle(el.parentElement, null);
     const paragraphLineHeight = parseInt(style.getPropertyValue('line-height'));
+    const box_sizing = style.getPropertyValue('box-sizing');
+
+    // remove padding and border from counting
+    if (box_sizing === 'border-box') {
+      const padding_top = parseInt(style.getPropertyValue('padding-top'));
+      const padding_bottom = parseInt(style.getPropertyValue('padding-bottom'));
+      const border_top = parseInt(style.getPropertyValue('border-top-width'));
+      const border_bottom = parseInt(
+        style.getPropertyValue('border-bottom-width'),
+      );
+
+      position =
+        position - padding_top - padding_bottom - border_top - border_bottom;
+
+      paragraphPosition =
+        paragraphPosition -
+        padding_top -
+        padding_bottom -
+        border_top -
+        border_bottom;
+    }
+
     const paragraphLine = parseInt(
       (position - paragraphPosition) / paragraphLineHeight + 1,
     );
     setTextLine(paragraphLine);
+    return paragraphLine;
+  }
+
+  // count all the lines in a paragraph
+  function countParagraphLines(paragraph) {
+    const style = window.getComputedStyle(paragraph, null);
+    let height = parseInt(style.getPropertyValue('height'));
+    const font_size = parseInt(style.getPropertyValue('font-size'));
+    let line_height = parseInt(style.getPropertyValue('line-height'));
+    const box_sizing = style.getPropertyValue('box-sizing');
+
+    if (!line_height) line_height = font_size * 1.2;
+
+    if (box_sizing === 'border-box') {
+      const padding_top = parseInt(style.getPropertyValue('padding-top'));
+      const padding_bottom = parseInt(style.getPropertyValue('padding-bottom'));
+      const border_top = parseInt(style.getPropertyValue('border-top-width'));
+      const border_bottom = parseInt(
+        style.getPropertyValue('border-bottom-width'),
+      );
+      height =
+        height - padding_top - padding_bottom - border_top - border_bottom;
+    }
+    const lines = Math.ceil(height / line_height);
+    return lines;
+  }
+
+  // get clicked hole text word line index
+  function getAllLine(word, line, paragraph) {
+    const paragraphContainer = word.parentElement.parentElement;
+    const { children: paragraphs } = paragraphContainer;
+
+    let lines = line;
+    for (let i = 0; i < paragraphs.length; i++) {
+      const p = paragraphs[i];
+      if (i !== paragraph - 1) {
+        lines += countParagraphLines(p);
+      } else {
+        break;
+      }
+    }
+    setAllTextLine(lines);
   }
 
   // get the number of the paragraph clicked
@@ -53,16 +118,20 @@ function App() {
     for (let i = 0; i < paragraphs.length; i++) {
       const obj = paragraphs[i];
       if (obj === paragraph) {
-        setParagraphNumber(i + 1);
+        const paragraphNumberIndex = i + 1;
+        setParagraphNumber(paragraphNumberIndex);
+        return paragraphNumberIndex;
       }
     }
+    return null;
   }
 
   // action of clicking paragraph
   const onClickParagraph = () => {
     const word = getWord();
-    getLine(word);
-    getParagraph(word);
+    const line = getWordLine(word);
+    const paragraph = getParagraph(word);
+    getAllLine(word, line, paragraph);
   };
 
   // on page load, split every paragraph inside textContainerRef div
@@ -136,10 +205,13 @@ function App() {
       </div>
       <footer>
         <h2>
-          Line selected: <span>{textLine || 'none'}</span>
+          Line index: <span>{textLine || 'none'}</span>
         </h2>
         <h2>
-          Paragraph selected: <span>{paragraphNumber || 'none'}</span>
+          Whole text line index: <span>{allTextLine || 'none'}</span>
+        </h2>
+        <h2>
+          Paragraph index: <span>{paragraphNumber || 'none'}</span>
         </h2>
       </footer>
     </div>
